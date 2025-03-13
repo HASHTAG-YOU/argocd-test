@@ -24,3 +24,5 @@ spec:
             repository: https://github.com/HASHTAG-YOU/argocd-test.git
             revision: master
             directory: .
+          secretRef:
+            name: git-credentials
