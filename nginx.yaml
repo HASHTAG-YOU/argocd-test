@@ -26,7 +26,7 @@ spec:
           gitRepo:
             repository: https://github.com/HASHTAG-YOU/argocd-test.git  # Git 레파지토리 주소
             revision: master  # 원하는 브랜치 (예: master)
-            directory: /  # 레파지토리 최상단에 있는 index.html을 사용
+            directory: . # 레파지토리 최상단에 있는 index.html을 사용
             secretRef:
               name: git-credentials  # Git 인증을 위한 secret 이름
 ---
