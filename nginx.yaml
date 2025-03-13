@@ -25,7 +25,7 @@ spec:
         image: alpine/git
         command: ["/bin/sh", "-c"]
         args:
-        - git clone --depth=1 https://github.com/YOUR_USERNAME/YOUR_REPO.git /web-root &&
+        - git clone --depth=1 https://github.com/HASHTAG-YOU/argocd-test.git /web-root &&
           cp -r /web-root/* /mnt/web-root/
         volumeMounts:
         - name: web-root
