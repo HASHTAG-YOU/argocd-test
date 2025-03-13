@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
-  labels:
-    app: nginx
 spec:
   replicas: 1
   selector:
@@ -14,21 +12,25 @@ spec:
       labels:
         app: nginx
     spec:
+      initContainers:
+        - name: git-clone
+          image: alpine:3.14
+          command: ["/bin/sh", "-c"]
+          args:
+            - "apk add --no-cache git && git clone https://github.com/HASHTAG-YOU/argocd-test.git /usr/share/nginx/html"
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html  # Nginx에 클론할 경로
+            name: html-volume
       containers:
         - name: nginx
           image: nginx:latest
           volumeMounts:
-            - name: html-volume
-              mountPath: /usr/share/nginx/html
-              subPath: index.html # index.html을 지정해서 마운트
+            - mountPath: /usr/share/nginx/html  # Nginx의 기본 웹 경로
+              name: html-volume
       volumes:
         - name: html-volume
-          gitRepo:
-            repository: https://github.com/HASHTAG-YOU/argocd-test.git  # Git 레파지토리 주소
-            revision: master  # 원하는 브랜치 (예: master)
-            directory: . # 레파지토리 최상단에 있는 index.html을 사용
-            secretRef:
-              name: git-credentials  # Git 인증을 위한 secret 이름
+          emptyDir: {}  # Git 클론 결과물을 저장할 임시 디렉토리
+
 ---
 apiVersion: v1
 kind: Service
@@ -39,6 +41,6 @@ spec:
     app: nginx
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: NodePort  # 외부에서 접근할 수 있게 설정 (필요시 ClusterIP로 변경 가능)
+      port: 80        # 서비스가 제공할 포트 (클러스터 내부에서 접근하는 포트)
+      targetPort: 80   # Nginx 컨테이너의 포트 (기본 80)
+  type: NodePort   # 외부 접근을 위한 LoadBalancer 타입 서비스 (혹은 NodePort)
